@@ -1,6 +1,22 @@
 <?php
 include("services/db.php");
 session_start();
+if (isset($_POST['input'])) {
+  $subject = $_POST['subject'];
+  $username = $_SESSION['username'];
+  $files = $_FILES['file']['name'];
+  $tmp_name = $_FILES['file']['tmp_name'];
+  move_uploaded_file($tmp_name, "images/" . $file);
+  $sql = "INSERT INTO `tblist` (`id`, `subject`, `date`, `likes`, `username`) VALUES (NULL, '$subject', current_timestamp(), '0', '$username')";
+  if ($db->query($sql)) {
+    header("location: dashboard.php");
+  }
+}
+
+
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,9 +49,9 @@ session_start();
 
       <div class="w-0 md:w-1/4 lg:w-1/5 h-0 md:h-screen overflow-y-hidden bg-white shadow-lg">
         <div class="p-5 bg-white sticky top-0">
-          <img class="border border-indigo-100 shadow-lg round" src="images/<?php $_SESSION['file'] ?>">
+          <img class="border border-indigo-100 shadow-lg round" src="http://lilithaengineering.co.za/wp-content/uploads/2017/08/person-placeholder.jpg">
           <div class="pt-2 border-t mt-5 w-full text-center text-xl text-gray-600">
-            Some Person
+            <?= $_SESSION['username'] ?>
           </div>
         </div>
         <div class="w-full h-screen antialiased flex flex-col hover:cursor-pointer">
@@ -47,37 +63,57 @@ session_start();
 
       <!-- End Navbar -->
 
+
       <div class="w-full md:w-3/4 lg:w-4/5 p-5 md:px-12 lg:24 h-full overflow-x-scroll antialiased">
         <div class="bg-white w-full shadow rounded-lg p-5">
-          <textarea class="bg-gray-200 w-full rounded-lg shadow border p-2" rows="5" placeholder="Speak your mind"></textarea>
-
-          <div class="w-full flex flex-row flex-wrap mt-3"> 
-            <div class="w-1/3">
-            </div>
-            <div class="w-2/3">
-              <button type="button" class="float-right bg-indigo-400 hover:bg-indigo-300 text-white p-2 rounded-lg">Submit</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3 flex flex-col">
-
-
-          <div class="bg-white mt-3">
-            <img class="border rounded-t-lg shadow-lg " src="https://images.unsplash.com/photo-1572817519612-d8fadd929b00?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80">
-            <div class="bg-white border shadow p-5 text-xl text-gray-700 font-semibold">
-              A Pretty Cool photo from the mountains. Image credit to @danielmirlea on Unsplash.
-            </div>
-            <div class="bg-white p-1 border shadow flex flex-row flex-wrap">
-              <div class="w-1/3 hover:bg-gray-200 text-center text-xl text-gray-700 font-semibold">Like</div>
-            </div>
-          </div>
+          <form action="dashboard.php" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" value="kirim" id="password" placeholder="email" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="">
+            <textarea type="text" name="subject" class="bg-gray-200 w-full rounded-lg shadow border p-2" rows="5" placeholder="Speak your mind"></textarea>
+            <div class="w-full flex flex-row flex-wrap mt-3">
+              <div class="w-1/3">
+              </div>
+              <div class="w-2/3">
+                <button type="submit" name="input" class="float-right bg-indigo-400 hover:bg-indigo-300 text-white p-2 rounded-lg">Submit</button>
+              </div>
+          </form>
         </div>
       </div>
+      <?php
+      $sqli = "SELECT * FROM tblist";
+      $hasil = $db->query($sqli);
+      $no = 1;
+      $urut = $no++;
+      while ($result = mysqli_fetch_array($hasil)) {
+        $id = $result['id'];
+        $subject = $result['subject'];
+        $tgl = $result['date'];
+        $username = $result['username'];
+        $likes = $result['likes'];
+      ?>
+        <table>
+          <td>
+            <div class="mt-3 flex flex-col">
+              <div class="bg-white p-1 border shadow flex flex-row flex-wrap">
+                <div class="w-1/3 hover:bg-gray-200 text-center text-xl text-gray-700 font-semibold"><?php echo $username ?></div>
+              </div>
+              <div class="bg-white">
+                <img class="border rounded-t-lg shadow-lg " src="images/<?php echo $files ?>">
+                <div class="bg-white border shadow p-5 text-xl text-gray-700 font-semibold">
+                  <?php echo $subject ?>
+                </div>
+                <div class="bg-white p-1 border shadow flex flex-row flex-wrap">
+                  <button type="checkbox" class="w-1/3 hover:bg-gray-200 text-center text-xl text-gray-700 font-semibold">Like</button>
+                  <p class="w-1/3 hover:bg-gray-200 text-center text-xl text-gray-700 font-semibold"><?php echo $likes  ?></p>
+                </div>
+              </div>
+            </div>
     </div>
   </div>
-
   </div>
+  </td>
+  </table>
+<?php } ?>
+</div>
 </body>
 
 </html>

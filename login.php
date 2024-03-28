@@ -2,7 +2,7 @@
 include("services/db.php");
 session_start();
 if (isset($_SESSION['is_login'])) {
-  header("location: about.php");
+  header("location: dashboard.php");
 }
 
 if (isset($_POST['login'])) {
@@ -17,7 +17,7 @@ if (isset($_POST['login'])) {
     $data = $result->fetch_assoc();
     $_SESSION["username"] = $data["username"];
     $_SESSION["is_login"] = true;
-    header("location: about.php");
+    header("location: dashboard.php");
   }
 }
 ?>
